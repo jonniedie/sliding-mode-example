@@ -40,6 +40,9 @@ begin
 	
 	# Sliders and GUI elements for this notebook
 	using PlutoUI
+
+	# We want to change the plot background color to be a little more transparant
+	using Colors
 	
 	# Easily log and inspect variables in the simulation with MATLAB-like "scope"
 	using SimulationLogs: @log, get_log, scope, scope!
@@ -53,7 +56,7 @@ begin
 	    ticks = :native,
 	    linewidth = 2,
 	    link = :x,
-		bglegend = PlotThemes.Colors.RGBA(colorant"#ffffff", 150/255),
+		bglegend = Colors.RGBA(Colors.colorant"#ffffff", 150/255),
 		dpi=900,
 	)
 end
@@ -631,6 +634,36 @@ plot(
 # ╔═╡ 7e47df67-1924-4532-b920-9a7823f5f8f4
 t = out.t;
 
+# ╔═╡ 32033679-eeed-41f2-b989-e3e47a24d1ea
+# Plot states
+plot(
+    (
+        if plot_mc
+			plot(t, log.v, ylabel="v [m/s]", label="monte carlo", title="States")
+		else
+			plot(ylabel="v [m/s]", title="States")
+		end;
+        plot!(t, nominal.(log.v), label="nominal", color=2);
+    ),
+    (
+        if plot_mc
+			plot(t, log.γ_deg, ylabel="γ [deg]", label=false)
+		else
+			plot(ylabel="γ [deg]")
+		end;
+        plot!(t, nominal.(log.γ_deg), label=false, color=2)
+    ),
+    (
+        if plot_mc
+			plot(t, log.σ_deg, ylabel="σ [deg]", label=false, xlabel = "t")
+		else
+			plot(ylabel="σ [deg]", xlabel = "t")
+		end;
+        plot!(t, nominal.(log.σ_deg), label=false, color=2)
+    ),
+    layout = (:, 1),
+)
+
 # ╔═╡ 8fe08b5d-8f75-4ac8-84d7-c8f751bd0c34
 ## Plot controller commands
 plot(
@@ -676,36 +709,6 @@ plot(
             color = :red,
 			xlabel = :t,
         )
-    ),
-    layout = (:, 1),
-)
-
-# ╔═╡ 32033679-eeed-41f2-b989-e3e47a24d1ea
-# Plot states
-plot(
-    (
-        if plot_mc
-			plot(t, log.v, ylabel="v [m/s]", label="monte carlo", title="States")
-		else
-			plot(ylabel="v [m/s]", title="States")
-		end;
-        plot!(t, nominal.(log.v), label="nominal", color=2);
-    ),
-    (
-        if plot_mc
-			plot(t, log.γ_deg, ylabel="γ [deg]", label=false)
-		else
-			plot(ylabel="γ [deg]")
-		end;
-        plot!(t, nominal.(log.γ_deg), label=false, color=2)
-    ),
-    (
-        if plot_mc
-			plot(t, log.σ_deg, ylabel="σ [deg]", label=false, xlabel = "t")
-		else
-			plot(ylabel="σ [deg]", xlabel = "t")
-		end;
-        plot!(t, nominal.(log.σ_deg), label=false, color=2)
     ),
     layout = (:, 1),
 )
@@ -774,6 +777,7 @@ md"""
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+Colors = "5ae59095-9a9b-59fe-a467-6f913c188581"
 ComponentArrays = "b0b7db55-cfe3-40fc-9ded-d10e2dbeff66"
 ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -786,6 +790,7 @@ SimulationLogs = "e3c6736c-93d9-479d-93f3-96ff5e8836d5"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
+Colors = "~0.13.0"
 ComponentArrays = "~0.15.26"
 ConcreteStructs = "~0.2.3"
 MonteCarloMeasurements = "~1.4.5"
@@ -803,7 +808,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.5"
 manifest_format = "2.0"
-project_hash = "b72243805f812183e971962a391fc9eaabd018b0"
+project_hash = "990d350f1faf95560c33e79d703c39577177a5b6"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "e2478490447631aedba0823d4d7a80b2cc8cdb32"
